@@ -1,0 +1,28 @@
+#camunda.bpm.client:
+#  base-url: http://192.168.0.1:8181/engine-rest # the URL pointing to the Camunda Platform Runtime REST API
+#  lock-duration: 10000 # defines how many milliseconds the External Tasks are locked until they can be fetched again
+#  subscriptions:
+#    scoreProvider: # topic name of the External Service Task
+#      variable-names: [ ] # our business logic doesn't require any variables, so don't fetch them
+#      process-definition-key: loan_process # only filter for External Tasks with this process definition key
+#    loanGranter:
+#      variable-names: customerId, creditScore # only fetch these two variables
+#      process-definition-key: loan_process
+
+logging.level.org.camunda.bpm.client: DEBUG # increase the log level of the application
+
+logging.file.name: logs/api.log
+
+spring.jpa:
+  hibernate.ddl-auto: update
+
+spring.datasource:
+  initialization-mode: always
+  platform: postgres
+  url: jdbc:postgresql://192.168.0.1:5432/camunda
+  username: postgres
+  password: toor
+  initialize: true
+  data: classpath*:db/migration/office_equipments.sql
+
+erp.base.url: https://wisconsin.integrity.com.ua/erp
