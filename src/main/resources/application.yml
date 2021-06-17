@@ -13,16 +13,12 @@ logging.level.org.camunda.bpm.client: DEBUG # increase the log level of the appl
 
 logging.file.name: logs/api.log
 
-spring.jpa:
-  hibernate.ddl-auto: update
+spring.jpa.hibernate:
+  ddl-auto: update
 
 spring.datasource:
-  initialization-mode: always
-  platform: postgres
   url: jdbc:postgresql://192.168.0.1:5432/camunda
   username: postgres
   password: toor
-  initialize: true
-  data: classpath*:db/migration/office_equipments.sql
 
 erp.base.url: https://wisconsin.integrity.com.ua/erp

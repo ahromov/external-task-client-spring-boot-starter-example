@@ -30,15 +30,16 @@ public class VacationingPositionsService implements JavaDelegate {
         Long orgUnit = (Long) delegateExecution.getVariableTyped("orgUnit").getValue();
         OrgUnitDto unitDto = this.restTemplate.getForObject(baseUrl + "/api/rest/org-structure/unit/" + orgUnit, OrgUnitDto.class);
         PositionDto positionDto = this.restTemplate.getForObject(baseUrl + "/api/rest/org-structure/position/" + unitDto.getPositions().get(0), PositionDto.class);
-
         List<VacationDto> employees = Arrays.asList(restTemplate.getForEntity(baseUrl + "/api/rest/org-structure/vacation", VacationDto[].class).getBody());
-        boolean isVacation = employees.stream().allMatch(vacationDto -> Long.valueOf(vacationDto.getEmployee()) == Long.valueOf(positionDto.getId()));
+        boolean isVacation = employees.stream().anyMatch(vacationDto -> {
+            if (Long.valueOf(vacationDto.getEmployee()) == Long.valueOf(positionDto.getEmployee())) ;
+            return true;
+        });
         if (isVacation) {
             setProcessVariables(delegateExecution, directorsPositionId, directorsPositionName);
         } else {
             setProcessVariables(delegateExecution, positionDto.getId(), positionDto.getTitle());
         }
-
         log.info("Processes variables", positionDto.getTitle());
     }
 

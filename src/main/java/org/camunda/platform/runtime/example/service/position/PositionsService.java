@@ -17,6 +17,7 @@
 package org.camunda.platform.runtime.example.service.position;
 
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.platform.runtime.example.service.position.dto.PositionDto;
@@ -38,9 +39,12 @@ public class PositionsService implements JavaDelegate {
     public void execute(DelegateExecution delegateExecution) throws Exception {
         Long positionId = Long.valueOf((String) delegateExecution.getVariable("positionId"));
         PositionDto positionDto = this.restTemplate.getForObject(baseUrl + "/api/rest/org-structure/position/" + positionId, PositionDto.class);
-        delegateExecution.setVariable("positionId", positionDto.getId());
-        delegateExecution.setVariable("positionName", positionDto.getTitle());
-        delegateExecution.setVariable("orgUnit", positionDto.getOrgUnit());
-        log.info(positionDto.getTitle());
+        if (positionDto.getEmployee() == null) {
+            delegateExecution.setVariable("positionId", positionDto.getId());
+            delegateExecution.setVariable("positionName", positionDto.getTitle());
+            delegateExecution.setVariable("orgUnit", positionDto.getOrgUnit());
+            log.info(positionDto.getTitle());
+        } else
+            throw new BpmnError("Позиция занята");
     }
 }

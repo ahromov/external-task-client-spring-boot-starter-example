@@ -12,10 +12,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SupplyRateDto implements Serializable {
+public class EquipmentAssignDto implements Serializable {
 
-    private Long id;
-    private String title;
-    private Long equipmentType;
-    private Integer amount;
+    private String serialNumber;
+    private Long employeeId;
 }

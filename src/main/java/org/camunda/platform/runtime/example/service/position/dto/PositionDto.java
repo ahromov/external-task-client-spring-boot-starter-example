@@ -17,5 +17,6 @@ public class PositionDto {
     private Long id;
     private String title;
     private Long orgUnit;
+    private Long employee;
     private List<Long> supplyRates;
 }
