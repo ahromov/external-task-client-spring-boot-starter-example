@@ -45,6 +45,6 @@ public class PositionsService implements JavaDelegate {
             delegateExecution.setVariable("orgUnit", positionDto.getOrgUnit());
             log.info(positionDto.getTitle());
         } else
-            throw new BpmnError("Позиция занята");
+            throw new BpmnError("401", "Позиция занята");
     }
 }
