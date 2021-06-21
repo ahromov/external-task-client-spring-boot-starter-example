@@ -1,4 +1,4 @@
-package org.camunda.platform.runtime.example.service.employment.dto;
+package org.camunda.platform.runtime.example.service.erp.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

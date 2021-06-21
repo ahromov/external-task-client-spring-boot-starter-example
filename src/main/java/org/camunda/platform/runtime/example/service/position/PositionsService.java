@@ -20,31 +20,30 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.platform.runtime.example.ProcessVariables;
 import org.camunda.platform.runtime.example.service.position.dto.PositionDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class PositionsService implements JavaDelegate {
 
-    private RestTemplate restTemplate = new RestTemplate();
-
-    @Value("${erp.base.url}")
-    private String baseUrl;
-
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
-        Long positionId = Long.valueOf((String) delegateExecution.getVariable("positionId"));
-        PositionDto positionDto = this.restTemplate.getForObject(baseUrl + "/api/rest/org-structure/position/" + positionId, PositionDto.class);
-        if (positionDto.getEmployee() == null) {
-            delegateExecution.setVariable("positionId", positionDto.getId());
-            delegateExecution.setVariable("positionName", positionDto.getTitle());
-            delegateExecution.setVariable("orgUnit", positionDto.getOrgUnit());
-            log.info(positionDto.getTitle());
-        } else
-            throw new BpmnError("401", "Позиция занята");
+        Long candidatesPositionId = (Long) delegateExecution.getVariable("FREE_POSITIONS_FORM");
+        List<PositionDto> freePositionsDtos = (List<PositionDto>) delegateExecution.getVariable(ProcessVariables.FREE_POSITIONS);
+
+        if (candidatesPositionId == null || candidatesPositionId == -1)
+            throw new BpmnError("400", "Free positions is not available");
+
+        Optional<PositionDto> positionDtos = freePositionsDtos.stream()
+                .filter(positionDto1 -> positionDto1.getId().equals(candidatesPositionId)).findFirst();
+
+        delegateExecution.setVariable(ProcessVariables.CANDIDATE_POSITION_ID, candidatesPositionId);
+        delegateExecution.setVariable(ProcessVariables.CANDIDATE_POSITION_NAME, positionDtos.get().getTitle());
+        delegateExecution.setVariable(ProcessVariables.ORG_UNIT_ID, positionDtos.get().getOrgUnit());
     }
 }
