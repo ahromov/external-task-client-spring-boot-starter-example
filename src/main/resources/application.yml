@@ -9,7 +9,7 @@
 #      variable-names: customerId, creditScore # only fetch these two variables
 #      process-definition-key: loan_process
 
-logging.level.org.camunda.bpm.client: DEBUG # increase the log level of the application
+#logging.level.org.camunda.bpm.client: DEBUG # increase the log level of the application
 
 logging.file.name: logs/api.log
 
