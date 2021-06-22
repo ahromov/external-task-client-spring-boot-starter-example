@@ -7,7 +7,6 @@ import org.camunda.platform.runtime.example.ApiRoutes;
 import org.camunda.platform.runtime.example.ProcessVariables;
 import org.camunda.platform.runtime.example.service.position.dto.PositionDto;
 import org.camunda.spin.Spin;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,7 +32,7 @@ public class FreePositionsService implements JavaDelegate {
     private Map<Long, String> extractPositionsName(List<PositionDto> positionDtos) {
         Map<Long, String> map = new HashMap<>();
         if (positionDtos.isEmpty()) {
-            map.put(-1l, "Нет свободных вакансий");
+            map.put(-1l, "Vacation not available");
         } else {
             positionDtos.forEach(positionDto -> {
                 map.put(positionDto.getId(), positionDto.getTitle());
