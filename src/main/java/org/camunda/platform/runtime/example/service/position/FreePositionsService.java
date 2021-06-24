@@ -5,10 +5,12 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.platform.runtime.example.ApiRoutes;
 import org.camunda.platform.runtime.example.ProcessVariables;
+import org.camunda.platform.runtime.example.service.rest.dto.Dto;
+import org.camunda.platform.runtime.example.service.rest.RestService;
 import org.camunda.platform.runtime.example.service.position.dto.PositionDto;
 import org.camunda.spin.Spin;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,11 +19,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FreePositionsService implements JavaDelegate {
 
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestService restService;
+
+    @Autowired
+    public FreePositionsService(RestService restService) {
+        this.restService = restService;
+    }
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
-        List<PositionDto> allPositions = Arrays.asList(this.restTemplate.getForEntity(ApiRoutes.POSITION, PositionDto[].class).getBody());
+        List<PositionDto> allPositions = restService.getAll(ApiRoutes.POSITION, PositionDto[].class);
         List<PositionDto> freePositions = allPositions.stream().filter(position -> position.getEmployee() == null).collect(Collectors.toList());
 
         delegateExecution.setVariable(ProcessVariables.ALL_POSITIONS, allPositions);
@@ -35,7 +42,8 @@ public class FreePositionsService implements JavaDelegate {
             map.put(-1l, "Vacation not available");
         } else {
             positionDtos.forEach(positionDto -> {
-                map.put(positionDto.getId(), positionDto.getTitle());
+                PositionDto dto = positionDto;
+                map.put(dto.getId(), dto.getTitle());
             });
         }
         return map;

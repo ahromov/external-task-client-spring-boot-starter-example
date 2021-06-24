@@ -6,13 +6,13 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.platform.runtime.example.ApiRoutes;
 import org.camunda.platform.runtime.example.ProcessVariables;
 import org.camunda.platform.runtime.example.service.position.dto.PositionDto;
+import org.camunda.platform.runtime.example.service.rest.RestService;
 import org.camunda.platform.runtime.example.service.vacation.dto.OrgUnitDto;
 import org.camunda.platform.runtime.example.service.vacation.dto.VacationDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,24 +20,31 @@ import java.util.List;
 @Slf4j
 public class VacationingPositionsService implements JavaDelegate {
 
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestService restService;
+
+    @Autowired
+    public VacationingPositionsService(RestService restService) {
+        this.restService = restService;
+    }
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
         Long orgUnitId = (Long) delegateExecution.getVariable(ProcessVariables.ORG_UNIT_ID);
         List<PositionDto> allPositions = (List<PositionDto>) delegateExecution.getVariable(ProcessVariables.ALL_POSITIONS);
-        OrgUnitDto unitDto = this.restTemplate.getForObject(ApiRoutes.UNIT + orgUnitId, OrgUnitDto.class);
-        List<VacationDto> vacationsDtos = Arrays.asList(restTemplate.getForEntity(ApiRoutes.VACATION, VacationDto[].class).getBody());
+        OrgUnitDto unitDto = restService.getById(ApiRoutes.UNIT, orgUnitId, OrgUnitDto.class);
+        List<VacationDto> vacationsDtos = restService.getAll(ApiRoutes.VACATION, VacationDto[].class);
 
         PositionDto directorsPosition = findDirectorsPosition(allPositions);
         PositionDto leadPosition = findLeadsPosition(unitDto.getPositions(), allPositions);
 
-        boolean isVacation = isVacation(leadPosition, vacationsDtos);
-        if (isVacation) {
-            setProcessVariables(delegateExecution, directorsPosition.getId(), directorsPosition.getTitle());
+        if (isVacation(leadPosition, vacationsDtos)) {
+            delegateExecution.setVariable(ProcessVariables.LEAD_POSITION_ID, directorsPosition.getId());
+            delegateExecution.setVariable(ProcessVariables.LEAD_POSITION_NAME, directorsPosition.getTitle());
         } else {
-            setProcessVariables(delegateExecution, leadPosition.getId(), leadPosition.getTitle());
+            delegateExecution.setVariable(ProcessVariables.LEAD_POSITION_ID, leadPosition.getId());
+            delegateExecution.setVariable(ProcessVariables.LEAD_POSITION_NAME, leadPosition.getTitle());
         }
+
         delegateExecution.setVariable(ProcessVariables.DIRECTORS_POSITION_ID, directorsPosition.getId());
     }
 
@@ -66,10 +73,5 @@ public class VacationingPositionsService implements JavaDelegate {
                 return true;
             return false;
         });
-    }
-
-    private void setProcessVariables(DelegateExecution delegateExecution, Long leadPositionId, String leadPositionName) {
-        delegateExecution.setVariable(ProcessVariables.LEAD_POSITION_ID, leadPositionId);
-        delegateExecution.setVariable(ProcessVariables.LEAD_POSITION_NAME, leadPositionName);
     }
 }

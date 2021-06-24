@@ -40,7 +40,8 @@ public class PositionsService implements JavaDelegate {
             throw new BpmnError("400", "Free positions is not available");
 
         Optional<PositionDto> positionDtos = freePositionsDtos.stream()
-                .filter(positionDto1 -> positionDto1.getId().equals(candidatesPositionId)).findFirst();
+                .filter(positionDto1 -> positionDto1.getId().equals(candidatesPositionId))
+                .findFirst();
 
         delegateExecution.setVariable(ProcessVariables.CANDIDATE_POSITION_ID, candidatesPositionId);
         delegateExecution.setVariable(ProcessVariables.CANDIDATE_POSITION_NAME, positionDtos.get().getTitle());

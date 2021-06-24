@@ -10,7 +10,7 @@ public class ProcessVariables {
     public static final String ALL_POSITIONS = "allPositions";
     public static final String FREE_POSITIONS = "freePositions";
     public static final String FREE_POSITIONS_NAMES = "freePositionsNames";
-    public static final String EQUIPES = "equipes";
+    public static final String EXISTS_EQUIPES = "equipes";
     public static final String IS_DISTRIBUTED = "isDistributed";
     public static final String NOT_EXISTED_EQUIPES = "notExistedEqipes";
     public static final String NOT_EXISTED_EQUIPES_NAMES = "notExistedEqipesNames";
