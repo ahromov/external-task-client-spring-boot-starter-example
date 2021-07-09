@@ -109,7 +109,7 @@ public class OfficeEquipmentsDistributionService implements JavaDelegate {
     private List<SupplyRateDto> getSupplyRateDtos(PositionDto positionDto) {
         List<SupplyRateDto> supplyRatesDtos = positionDto.getSupplyRates().stream()
                 .map(id -> {
-                    SupplyRateDto forObject = (SupplyRateDto) restService.getById(ApiRoutes.SUPPLY_RATE, id, SupplyRateDto.class);
+                    SupplyRateDto forObject = restService.getById(ApiRoutes.SUPPLY_RATE, id, SupplyRateDto.class);
                     return forObject;
                 }).collect(Collectors.toList());
         return supplyRatesDtos;
